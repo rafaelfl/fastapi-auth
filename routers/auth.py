@@ -1,6 +1,6 @@
 """Endpoints for authentication"""
 from typing import Annotated, Union
-from fastapi import APIRouter, Cookie, Response, Depends
+from fastapi import APIRouter, Cookie, HTTPException, Response, Depends, status
 from sqlalchemy.orm import Session
 from depends import get_db
 from schemas.response_result import ResponseResult
@@ -51,6 +51,12 @@ def refresh_tokens(
     db: Session = Depends(get_db),
 ):
     """Endpoint for refreshing an expired access token"""
+    if refresh_token is None:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid token",
+        )
+
     user_usecase = UserUseCase(db)
 
     user = user_usecase.refresh_user_token(refresh_token)
