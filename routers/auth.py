@@ -54,7 +54,7 @@ def refresh_tokens(
     if refresh_token is None:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid token",
+            detail="No refresh token available",
         )
 
     user_usecase = UserUseCase(db)
