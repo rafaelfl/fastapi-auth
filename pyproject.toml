@@ -1,0 +1,20 @@
+[tool.poetry]
+name = "pyproject"
+version = "0.1.0"
+description = ""
+authors = ["Rafael Fernandes Lopes <rafael.fernandes@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.9"
+fastapi = {extras = ["all"], version = "^0.104.1"}
+passlib = {extras = ["bcrypt"], version = "^1.7.4"}
+sqlalchemy = "^2.0.23"
+alembic = "^1.12.1"
+python-decouple = "^3.8"
+python-jose = "^3.3.0"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
