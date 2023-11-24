@@ -1,11 +1,13 @@
 """Main module for the REST API"""
 import uvicorn
 from fastapi import FastAPI
-from app.schemas.response_result import ResponseResult
+from version import __version__
 
+from app.schemas.response_result import ResponseResult
 from app.routers import auth
 
-app = FastAPI()
+
+app = FastAPI(version=__version__)
 
 app.include_router(auth.router, tags=["auth"])
 
