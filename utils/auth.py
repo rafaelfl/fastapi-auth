@@ -9,7 +9,7 @@ from utils.jwt import decode_token_payload
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
 
 
-def get_current_user_uuid(token: Annotated[str, Depends(oauth2_scheme)]):
+def get_access_token_user_uuid(token: Annotated[str, Depends(oauth2_scheme)]):
     """Function for extracting Authorization header and return the user UUID key"""
     return decode_user_uuid(token, settings.access_token_private_key)
 

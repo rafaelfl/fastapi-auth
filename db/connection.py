@@ -13,4 +13,11 @@ engine = create_engine(
 SessionLocal = sessionmaker()
 SessionLocal.configure(autocommit=False, autoflush=False, bind=engine)
 
-session = SessionLocal()
+
+def get_db():
+    """Function for retrieving a global Session database connection"""
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()

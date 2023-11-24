@@ -2,13 +2,13 @@
 from typing import Annotated, Union
 from fastapi import APIRouter, Cookie, HTTPException, Response, Depends, status
 from sqlalchemy.orm import Session
-from depends import get_db
+from db.connection import get_db
 from schemas.response_result import ResponseResult
 from schemas.user import UserCreate, UserSignIn
 from utils.settings import settings
-from usecases.user import UserUseCase
-from utils.auth import get_current_user_uuid
+from utils.auth import get_access_token_user_uuid
 from utils.jwt import create_user_tokens
+from usecases.user import UserUseCase
 
 router = APIRouter()
 
@@ -75,6 +75,6 @@ def refresh_tokens(
 
 
 @router.get("/auth/test", response_model=ResponseResult)
-def test_api(user_uuid: Annotated[str, Depends(get_current_user_uuid)]):
+def test_api(user_uuid: Annotated[str, Depends(get_access_token_user_uuid)]):
     """Protected test endpoint that only allows access using a valid access token"""
     return {"status": True, "message": "Success", "data": user_uuid}
