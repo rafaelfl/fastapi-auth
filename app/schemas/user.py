@@ -19,4 +19,4 @@ class User(UserBase):
     """User schema class for storing data coming from the database"""
     uuid: str
     name: str
-    last_update: datetime
+    created_at: datetime

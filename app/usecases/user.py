@@ -34,7 +34,7 @@ class UserUseCase:
             user_result = User(
                 uuid=db_user.uuid,
                 username=db_user.username,
-                last_update=db_user.last_update,
+                created_at=db_user.created_at,
                 name=db_user.name,
             )
 
@@ -64,7 +64,7 @@ class UserUseCase:
             user_result = User(
                 uuid=db_user.uuid,
                 username=db_user.username,
-                last_update=db_user.last_update,
+                created_at=db_user.created_at,
                 name=db_user.name,
             )
 
@@ -88,7 +88,7 @@ class UserUseCase:
             user_result = User(
                 uuid=db_user.uuid,
                 username=db_user.username,
-                last_update=db_user.last_update,
+                created_at=db_user.created_at,
                 name=db_user.name,
             )
 

@@ -18,4 +18,12 @@ class UserModel(Base):
     username = Column(String, unique=True)
     password = Column(String)
     name = Column(String)
-    last_update = Column(DateTime, default=datetime.utcnow)
+    created_at = Column(DateTime, default=datetime.utcnow)
+
+class UserTokenModel(Base):
+    """Model for registering the generated user refresh tokens"""
+    __tablename__ = "user_token"
+    uuid = Column(String, primary_key=True)
+    refresh_token = Column(String, primary_key=True)
+    created_at = Column(DateTime, default=datetime.utcnow)
+    
