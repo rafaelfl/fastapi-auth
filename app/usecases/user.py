@@ -4,10 +4,10 @@ from fastapi import HTTPException, status
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError, NoResultFound
 from passlib.context import CryptContext
-from db.models import UserModel
-from schemas.user import UserCreate, User, UserSignIn
-from utils.settings import settings
-from utils.auth import decode_user_uuid
+from app.db.models import UserModel
+from app.schemas.user import UserCreate, User, UserSignIn
+from app.utils.settings import settings
+from app.utils.auth import decode_user_uuid
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 

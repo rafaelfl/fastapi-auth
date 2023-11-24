@@ -1,9 +1,9 @@
 """Utility functions for handling JWT tokens"""
 from datetime import datetime, timedelta
 from jose import jwt, JWTError, ExpiredSignatureError
-from errors import TokenDecodingException, TokenExpiredException
-from schemas.user import User
-from utils.settings import settings
+from app.errors import TokenDecodingException, TokenExpiredException
+from app.schemas.user import User
+from app.utils.settings import settings
 
 
 def create_jwt_token(uuid: str, secret: str, expires_delta: timedelta):

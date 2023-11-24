@@ -2,9 +2,9 @@
 from typing import Annotated
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
-from errors import TokenDecodingException, TokenExpiredException
-from utils.settings import settings
-from utils.jwt import decode_token_payload
+from app.errors import TokenDecodingException, TokenExpiredException
+from app.utils.settings import settings
+from app.utils.jwt import decode_token_payload
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
 

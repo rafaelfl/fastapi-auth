@@ -2,13 +2,13 @@
 from typing import Annotated, Union
 from fastapi import APIRouter, Cookie, HTTPException, Response, Depends, status
 from sqlalchemy.orm import Session
-from db.connection import get_db
-from schemas.response_result import ResponseResult
-from schemas.user import UserCreate, UserSignIn
-from utils.settings import settings
-from utils.auth import get_access_token_user_uuid
-from utils.jwt import create_user_tokens
-from usecases.user import UserUseCase
+from app.db.connection import get_db
+from app.schemas.response_result import ResponseResult
+from app.schemas.user import UserCreate, UserSignIn
+from app.utils.settings import settings
+from app.utils.auth import get_access_token_user_uuid
+from app.utils.jwt import create_user_tokens
+from app.usecases.user import UserUseCase
 
 router = APIRouter()
 

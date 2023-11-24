@@ -1,9 +1,9 @@
 """Main module for the REST API"""
 import uvicorn
 from fastapi import FastAPI
-from schemas.response_result import ResponseResult
+from app.schemas.response_result import ResponseResult
 
-from routers import auth
+from app.routers import auth
 
 app = FastAPI()
 
