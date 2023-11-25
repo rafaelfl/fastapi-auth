@@ -1,4 +1,4 @@
-"""Use cases for handling user authentication tasks"""
+"""Service for handling user authentication tasks"""
 from fastapi import HTTPException, status
 
 from sqlalchemy.orm import Session
@@ -12,8 +12,8 @@ from app.utils.auth import decode_user_uuid
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 
-class UserUseCase:
-    """Use case class for handling user tasks"""
+class UserService:
+    """User service class for handling user related JWT and database connections"""
     def __init__(self, db: Session):
         self.db = db
 
@@ -61,6 +61,8 @@ class UserUseCase:
                     detail="Invalid username or password",
                 )
 
+            print(" >>>> db_user", db_user.usertokens)
+
             user_result = User(
                 uuid=db_user.uuid,
                 username=db_user.username,
@@ -79,6 +81,12 @@ class UserUseCase:
     def refresh_user_token(self, refresh_token: str):
         """Refresh tokens use case method"""
         db = self.db
+        
+        if refresh_token is None:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="No refresh token available",
+            )
 
         user_uuid = decode_user_uuid(refresh_token, settings.refresh_token_private_key)
 

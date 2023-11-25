@@ -1,8 +1,8 @@
 """Main module for the REST API"""
 import uvicorn
 from fastapi import FastAPI
-from version import __version__
 
+from app.version import __version__
 from app.schemas.response_result import ResponseResult
 from app.routers import auth
 
