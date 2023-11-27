@@ -91,15 +91,15 @@ class UserService:
             # (i.e., someone else used it), force the sign-in from all devices again
             if usertoken is None:
                 print(
-                    f"""The refresh token sent from {user_uuid} could be used in another
-                      device. All devices were signed out."""
+                    f"The refresh token sent from {user_uuid} could be used in another\
+                      device. All devices were signed out."
                 )
                 usertoken_service.remove_all_user_tokens_by_uuid(user_uuid)
 
                 raise HTTPException(
                     status_code=status.HTTP_401_UNAUTHORIZED,
-                    detail="""Reusing rotated refresh token is not allowed.
-                    Expiring all refresh tokens""",
+                    detail="Reusing rotated refresh token is not allowed.\
+                    Expiring all refresh tokens",
                 )
 
             usertoken_service.remove_user_token_by_token(refresh_token)
