@@ -23,7 +23,7 @@ def decode_user_uuid(token: str, secret: str):
 
     try:
         payload = decode_token_payload(token, secret)
-        user_uuid = payload["sub"]
+        user_uuid = str(payload["sub"])
 
         return user_uuid
     except KeyError as err:

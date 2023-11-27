@@ -2,6 +2,7 @@
 from typing import Annotated, Union
 from fastapi import APIRouter, Cookie, HTTPException, Response, Depends
 from sqlalchemy.orm import Session
+from sqlalchemy.exc import SQLAlchemyError
 from app.db.connection import get_db
 from app.schemas.response_result import ResponseResult
 from app.schemas.user import UserCreate, UserSignIn
@@ -43,7 +44,7 @@ def login_user(
                 refresh_token, settings.refresh_token_private_key
             )
 
-            user_token = usertoken_service.find_user_token(refresh_token)
+            user_token = usertoken_service.find_usertoken(refresh_token)
 
             # if the refresh token doesn't exist in the database, it means that someone
             # else rotated it! So, let's clear all valid refresh tokens
@@ -51,12 +52,16 @@ def login_user(
                 usertoken_service.remove_all_user_tokens_by_uuid(user_uuid)
             else:
                 usertoken_service.remove_user_token_by_token(user_token.refresh_token)
+
+            response.delete_cookie(key=refresh_token)
     except HTTPException:
-        pass
+        pass  # ignore errors when decoding token and continue the login
+    except SQLAlchemyError:
+        pass  # ignore errors when querying or deleting usertoken entries and continue the login
 
-    user = user_service.signin(user_signin)
+    user_uuid = user_service.signin(user_signin)
 
-    tokens = create_user_tokens(user)
+    tokens = create_user_tokens(user_uuid)
     new_refresh_token = tokens["refresh_token"]
 
     response.set_cookie(
@@ -68,8 +73,8 @@ def login_user(
         secure=True,
     )
 
-    usertoken_service.create_user_token(
-        UserTokenCreate(uuid=user.uuid, refresh_token=new_refresh_token)
+    usertoken_service.insert_user_token(
+        UserTokenCreate(uuid=user_uuid, refresh_token=new_refresh_token)
     )
 
     return {"status": True, "message": "Success", "data": tokens}
@@ -83,16 +88,24 @@ def refresh_tokens(
 ):
     """Endpoint for refreshing an expired access token"""
     user_service = UserService(db)
+    usertoken_service = UserTokenService(db)
 
-    user = user_service.refresh_user_token(refresh_token)
+    user_uuid = user_service.refresh_user_token(refresh_token)
 
-    tokens = create_user_tokens(user)
+    # let's delete the refresh token to rotate it
+    response.delete_cookie(key=refresh_token)
 
-    refresh_token = tokens["refresh_token"]
+    tokens = create_user_tokens(user_uuid)
+
+    new_refresh_token = tokens["refresh_token"]
+
+    usertoken_service.insert_user_token(
+        UserTokenCreate(uuid=user_uuid, refresh_token=new_refresh_token)
+    )
 
     response.set_cookie(
         key="refresh_token",
-        value=refresh_token,
+        value=new_refresh_token,
         expires=settings.refresh_token_expiration * 60,
         httponly=True,
         samesite="lax",

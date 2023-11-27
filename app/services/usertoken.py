@@ -11,7 +11,7 @@ class UserTokenService:
     def __init__(self, db: Session):
         self.db = db
 
-    def create_user_token(self, usertoken: UserTokenCreate):
+    def insert_user_token(self, usertoken: UserTokenCreate):
         """Create a new usertoken record to store the current valid refresh token"""
         db = self.db
 
@@ -32,7 +32,7 @@ class UserTokenService:
 
         return usertoken
 
-    def find_user_token(self, token: str):
+    def find_usertoken(self, token: str):
         """Return a UserToken object found by a refresh token"""
         db = self.db
 
@@ -59,9 +59,11 @@ class UserTokenService:
         db = self.db
 
         db.query(UserTokenModel).filter_by(uuid=uuid).delete()
+        db.commit()
 
     def remove_user_token_by_token(self, token: str):
         """Remove the UserToken record by token"""
         db = self.db
 
         db.query(UserTokenModel).filter_by(refresh_token=token).delete()
+        db.commit()

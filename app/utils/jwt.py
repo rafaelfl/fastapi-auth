@@ -19,16 +19,16 @@ def create_jwt_token(uuid: str, secret: str, expires_delta: timedelta):
     return encoded_jwt
 
 
-def create_user_tokens(user: User):
+def create_user_tokens(uuid: str):
     """Function for creating and returning the access and refresh tokens based on an user data"""
     access_token_expires = timedelta(minutes=settings.access_token_expiration)
     access_token = create_jwt_token(
-        user.uuid, settings.access_token_private_key, access_token_expires
+        uuid, settings.access_token_private_key, access_token_expires
     )
 
     refresh_token_expires = timedelta(minutes=settings.refresh_token_expiration)
     refresh_token = create_jwt_token(
-        user.uuid, settings.refresh_token_private_key, refresh_token_expires
+        uuid, settings.refresh_token_private_key, refresh_token_expires
     )
 
     return {"access_token": access_token, "refresh_token": refresh_token}

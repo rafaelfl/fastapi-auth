@@ -2,10 +2,11 @@
 from fastapi import HTTPException, status
 
 from sqlalchemy.orm import Session
-from sqlalchemy.exc import IntegrityError, NoResultFound
+from sqlalchemy.exc import IntegrityError, NoResultFound, SQLAlchemyError
 from passlib.context import CryptContext
 from app.db.models import UserModel
 from app.schemas.user import UserCreate, User, UserSignIn
+from app.services.usertoken import UserTokenService
 from app.utils.settings import settings
 from app.utils.auth import decode_user_uuid
 
@@ -14,6 +15,7 @@ pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 class UserService:
     """User service class for handling user related JWT and database connections"""
+
     def __init__(self, db: Session):
         self.db = db
 
@@ -60,17 +62,7 @@ class UserService:
                     status_code=status.HTTP_401_UNAUTHORIZED,
                     detail="Invalid username or password",
                 )
-
-            print(" >>>> db_user", db_user.usertokens)
-
-            user_result = User(
-                uuid=db_user.uuid,
-                username=db_user.username,
-                created_at=db_user.created_at,
-                name=db_user.name,
-            )
-
-            return user_result
+            return str(db_user.uuid)
 
         except NoResultFound as err:
             raise HTTPException(
@@ -81,7 +73,8 @@ class UserService:
     def refresh_user_token(self, refresh_token: str):
         """Refresh tokens use case method"""
         db = self.db
-        
+        usertoken_service = UserTokenService(db)
+
         if refresh_token is None:
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
@@ -91,17 +84,28 @@ class UserService:
         user_uuid = decode_user_uuid(refresh_token, settings.refresh_token_private_key)
 
         try:
-            db_user = db.query(UserModel).filter(UserModel.uuid == user_uuid).one()
+            # look for a valid refresh token
+            usertoken = usertoken_service.find_usertoken(refresh_token)
 
-            user_result = User(
-                uuid=db_user.uuid,
-                username=db_user.username,
-                created_at=db_user.created_at,
-                name=db_user.name,
-            )
+            # in case a (valid) refresh token arives here but it is not in the database
+            # (i.e., someone else used it), force the sign-in from all devices again
+            if usertoken is None:
+                print(
+                    f"""The refresh token sent from {user_uuid} could be used in another
+                      device. All devices were signed out."""
+                )
+                usertoken_service.remove_all_user_tokens_by_uuid(user_uuid)
 
-            return user_result
-        except NoResultFound as err:
+                raise HTTPException(
+                    status_code=status.HTTP_401_UNAUTHORIZED,
+                    detail="""Reusing rotated refresh token is not allowed.
+                    Expiring all refresh tokens""",
+                )
+
+            usertoken_service.remove_user_token_by_token(refresh_token)
+
+            return user_uuid
+        except SQLAlchemyError as err:
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 detail="Invalid token",
