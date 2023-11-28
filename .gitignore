@@ -68,3 +68,5 @@ venv/
 .venv/
 
 .DS_Store
+
+.env
