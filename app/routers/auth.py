@@ -116,6 +116,16 @@ def refresh_tokens(
 
 
 @router.get("/auth/test", response_model=ResponseResult)
-def test_api(user_uuid: Annotated[str, Depends(get_access_token_user_uuid)]):
+def test_api(
+    user_uuid: Annotated[str, Depends(get_access_token_user_uuid)],
+    # redis: Redis = Depends(get_redis),
+):
     """Protected test endpoint that only allows access using a valid access token"""
+
+    # blocklist_service = BlockListService(redis)
+
+    # blocklist_service.add_token_to_blocklist(
+    #     "abcdef", datetime.now() + timedelta(minutes=1)
+    # )
+
     return {"status": True, "message": "Success", "data": user_uuid}

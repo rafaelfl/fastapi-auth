@@ -2,7 +2,6 @@
 from datetime import datetime, timedelta
 from jose import jwt, JWTError, ExpiredSignatureError
 from app.errors import TokenDecodingException, TokenExpiredException
-from app.schemas.user import User
 from app.utils.settings import settings
 
 
